@@ -230,7 +230,7 @@ export class Grid<T> {
     }
 }
 
-class GridCursor<T> {
+export class GridCursor<T> {
     constructor(
         readonly grid: Grid<T>,
         readonly x: number,
@@ -382,12 +382,37 @@ class GridCursor<T> {
         return new GridArea(this.grid, x1, y1, x2, y2)
     }
 
-    offset(dx, dy) {
+    areaToOffset(dx: number, dy: number) {
+        return new GridArea(this.grid, this.x, this.y, this.x + dx, this.y + dy)
+    }
+
+    hasOffset(dx: number, dy: number) {
+        const newX = this.x + dx
+        const newY = this.y + dy
+
+        return newX >= 0 && newY >= 0 && newX < this.grid.width && newY < this.grid.height
+    }
+
+    offset(dx: number, dy: number) {
         return new GridCursor(this.grid, this.x + dx, this.y + dy)
+    }
+
+    ray(dx: number, dy: number) {
+        const items: T[] = []
+
+        const directionX = Math.sign(dx)
+        const directionY = Math.sign(dy)
+        const len = Math.max(Math.abs(dx), Math.abs(dy))
+
+        for (let i = 0; i <= len; i++) {
+            items.push(this.offset(directionX * i, directionY * i).value)
+        }
+
+        return items
     }
 }
 
-class GridArea<T> {
+export class GridArea<T> {
     constructor(
         readonly grid: Grid<T>,
         readonly x1: number,
@@ -414,11 +439,11 @@ class GridArea<T> {
     }
 
     get width() {
-        return this.x2 - this.x1 + 1
+        return Math.abs(this.x2 - this.x1) + 1
     }
 
     get height() {
-        return this.y2 - this.y1 + 1
+        return Math.abs(this.y2 - this.y1) + 1
     }
 
     get isOneLineHorizontal() {

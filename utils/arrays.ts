@@ -33,3 +33,44 @@ export function permutations<T>(arr: T[]): T[][] {
 
     return result
 }
+
+export function product<T>(arraysToCombine: T[][]): T[][] {
+    const divisors: number[] = []
+    let combinationsCount = 1
+    for (let i = arraysToCombine.length - 1; i >= 0; i--) {
+        divisors[i] = divisors[i + 1] ? divisors[i + 1] * arraysToCombine[i + 1].length : 1
+        combinationsCount *= (arraysToCombine[i].length || 1)
+    }
+
+    const getCombination = (n: number, arrays: T[][], divisors: number[]) => arrays.reduce((acc, arr, i) => {
+        acc.push(arr[Math.floor(n / divisors[i]) % arr.length])
+        return acc
+    }, [])
+
+    const combinations: T[][] = []
+    for (let i = 0; i < combinationsCount; i++) {
+        combinations.push(getCombination(i, arraysToCombine, divisors))
+    }
+
+    return combinations
+}
+
+export function combinations<T>(items: T[], k: number): T[][] {
+    const result: T[][] = []
+
+    function generateArrays(current: T[], remaining: number) {
+        if (remaining === 0) {
+            result.push([...current])
+            return
+        }
+
+        for (let i = 0; i < items.length; i++) {
+            current.push(items[i])
+            generateArrays(current, remaining - 1)
+            current.pop()
+        }
+    }
+
+    generateArrays([], k)
+    return result
+}

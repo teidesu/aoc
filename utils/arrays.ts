@@ -74,3 +74,23 @@ export function combinations<T>(items: T[], k: number): T[][] {
     generateArrays([], k)
     return result
 }
+
+export function combinationsNoRepeat<T>(items: T[], k: number): T[][] {
+    const result: T[][] = []
+
+    function generateArrays(current: T[], start: number, remaining: number) {
+        if (remaining === 0) {
+            result.push([...current])
+            return
+        }
+
+        for (let i = start; i < items.length; i++) {
+            current.push(items[i])
+            generateArrays(current, i, remaining - 1)
+            current.pop()
+        }
+    }
+
+    generateArrays([], 0, k)
+    return result
+}
